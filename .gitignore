@@ -18,7 +18,7 @@ storage/
 webroot/
 
 # Ignore specific config files
-config/App.php
+config/app.php
 config/bootstrap.php
 
 # Server specific
