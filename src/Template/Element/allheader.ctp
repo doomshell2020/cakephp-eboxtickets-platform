@@ -25,7 +25,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" sizes="16x16" href="<?php echo SITE_URL; ?>images/favicon.png">
-    <!-- <title>eboxtickets</title> -->
+    
+    <?php
+    $controller = $this->request->getParam('controller');
+    $action     = $this->request->getParam('action');
+
+    // Convert camelCase to words
+    $controllerTitle = ucwords(preg_replace('/([a-z])([A-Z])/', '$1 $2', $controller));
+    $actionTitle     = ucwords(preg_replace('/([a-z])([A-Z])/', '$1 $2', $action));
+
+    // Default title
+    $pageTitle = $controllerTitle;
+
+    // Common action mapping
+    if ($action !== 'index') {
+        $pageTitle .= ' - ' . $actionTitle;
+    }
+    ?>
+    <title><?= $pageTitle ?> | eboxtickets</title>
+
 
 
     <?php echo $this->Html->meta('title', $title, ['property' => "og:title"]); ?>
