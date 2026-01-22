@@ -35,17 +35,12 @@ class LoginsController extends AppController
 
 	public function frontlogin()
 	{
-		// $this->autoRender = false;
 		$where = $this->request->session()->read('Auth.User');
 
 		if ($where['id']) {
 			if ($where['role_id'] == 2 && $where['status'] == 'Y') {
 				$uty = $this->request->session()->read('Auth.User.role_id');
-				if ($uty == '2') {
-					return $this->redirect(['controller' => 'homes', 'action' => 'index']);
-				}
-				if ($uty == '3') {
-					// return $this->redirect(['controller' => 'tickets', 'action' => 'myticket']);
+				if ($uty == '2' || $uty == '3') {
 					return $this->redirect(['controller' => 'homes', 'action' => 'index']);
 				}
 			}
@@ -53,46 +48,53 @@ class LoginsController extends AppController
 
 		if ($this->request->is('post')) {
 
-			// pr($_POST);exit;
+			// ✅ CHECK LOCALHOST
+			$isLocalhost = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']);
 
-			if (isset($_POST['g-recaptcha-response'])) {
-				$captcha = $_POST['g-recaptcha-response'];
-			}
-			$secretKey = "6LeB9HAiAAAAAP7Dp8Km2ozGm42nFObhMTXA7syu";
-			$ip = $_SERVER['REMOTE_ADDR'];
-			$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
-			$response = file_get_contents($url);
-			$responseKeys = json_decode($response, true);
-			if ($responseKeys["success"]) {
-			} else {
+			if (!$isLocalhost) {
 
-				$this->Flash->error(__('Captcha entry is incorrect, try again'));
-				return $this->redirect(['action' => 'frontlogin']);
+				// 🔐 CAPTCHA CHECK (LIVE ONLY)
+				if (isset($_POST['g-recaptcha-response'])) {
+					$captcha = $_POST['g-recaptcha-response'];
+				}
+
+				$secretKey = "6LeB9HAiAAAAAP7Dp8Km2ozGm42nFObhMTXA7syu";
+				$url = 'https://www.google.com/recaptcha/api/siteverify?secret='
+					. urlencode($secretKey)
+					. '&response=' . urlencode($captcha);
+
+				$response = file_get_contents($url);
+				$responseKeys = json_decode($response, true);
+
+				if (empty($responseKeys['success'])) {
+					$this->Flash->error(__('Captcha entry is incorrect, try again'));
+					return $this->redirect(['action' => 'frontlogin']);
+				}
 			}
-			// pr($this->request->data);exit;
+			// ✅ CAPTCHA BYPASS ENDS HERE (LOCALHOST)
+
 			$this->request->data['email'] = $this->request->data['email'];
 			$user = $this->Auth->identify();
 
 			if (($user['role_id'] == 2 || $user['role_id'] == 3) && $user['status'] == 'Y') {
+
 				$this->Auth->setUser($user);
 				$uty = $this->request->session()->read('Auth.User.role_id');
-				if ($uty == '2') {
-					return $this->redirect(['controller' => 'homes', 'action' => 'index']);
-				}
-				if ($uty == '3') {
-					// return $this->redirect(['controller' => 'tickets', 'action' => 'myticket']);
-					return $this->redirect(['controller' => 'homes', 'action' => 'index']);
-				}
+
+				return $this->redirect(['controller' => 'homes', 'action' => 'index']);
 			} else {
+
 				if ($user['status'] == 'N') {
 					$this->Flash->error(__('Email verification is not complete. Please check your registered email for a verification link.'));
-					return $this->redirect(['action' => 'frontlogin']);
+				} else {
+					$this->Flash->error(__('Invalid email or password. Please try again.'));
 				}
-				$this->Flash->error(__('Invalid email or password. Please try again.'));
+
 				return $this->redirect(['action' => 'frontlogin']);
 			}
 		}
 	}
+
 
 	public function frontlogout()
 	{

@@ -32,14 +32,20 @@
               <!-- <input type="email" class="form-control" name="email" placeholder="Email" required>
               <input type="password" class="form-control" name="password" placeholder="Password" required> -->
               <?php echo $this->Form->input('email', array(
-                'value' => $email, 'type' => 'email', 'class' => 'form-control',
-                'placeholder' => 'Username', 'required' => 'required'
+                'value' => $email,
+                'type' => 'email',
+                'class' => 'form-control',
+                'placeholder' => 'Username',
+                'required' => 'required'
               )); ?>
 
               <?php echo $this->Form->input('password', array('value' => $password, 'class' => 'form-control', 'placeholder' => 'Password', 'required' => 'required')); ?>
 
 
-              <div id="html_element" class="login_capcher"></div>
+              <?php if ($_SERVER['HTTP_HOST'] != 'localhost') { ?>
+                <div id="html_element" class="login_capcher"></div>
+              <?php } ?>
+
 
 
               <div class="row justify-content-space-between">
@@ -96,7 +102,7 @@
     height: 76px !important;
     z-index: -999999;
     opacity: 0;
-}
+  }
 </style>
 
 <!-- ================================= -->
