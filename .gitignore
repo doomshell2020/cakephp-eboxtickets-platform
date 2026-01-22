@@ -1,0 +1,25 @@
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.*
+
+# Logs & temp
+logs/
+tmp/
+cache/
+storage/
+*.log
+
+# Ignore full webroot
+webroot/
+
+# Ignore specific config files
+config/App.php
+config/bootstrap.php
+
+# Server specific
+.htaccess
